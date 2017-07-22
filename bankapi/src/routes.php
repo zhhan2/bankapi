@@ -19,52 +19,40 @@ function writeFail($response, $status, $message) {
   )));
 };
 
-$app->get('/[{name}]', function ($request, $response, $args) {
-    // Sample log message
-    $this->logger->info("Slim-Skeleton '/' route");
-
-    // Render index view
-    return $this->renderer->render($response, 'index.phtml', $args);
-});
-// request validator for /aacount/create
-$accountCreateValidator = array(
-  'owner' => v::alnum()
-);
-
 $app->post('/account/create', function ($request, $response, $args) {
-  if($request->getAttribute('has_errors')){
-    $errors = $request->getAttribute('errors');
-    return $response->withStatus(500)->getBody()->write($errors->toJson());
-  } else {
     $data = $request->getParsedBody();
-    $accountid = MongoHelper::getInstance()->createAccount($data['name'], $data['id'], 0.0);
-    return writeSuccess($response, array(
-      'owner' => $data['name'],
-      'accountId' => $accountid
-    ));
-  }
+    $dataValidator = v::key('name', v::stringType()->length(1,32))
+                    ->key('id', v::stringType()->length(1,32));
+    if ($dataValidator->validate($data)) {
+      $accountid = MongoHelper::getInstance()->createAccount($data['name'], $data['id'], 0.0);
+      return writeSuccess($response, array(
+        'owner' => $data['name'],
+        'accountId' => $accountid
+      ));
+    } else {
+      return writeFail($response, 400, 'Invalid input Need valid attributes *name*: String, *id*: String.');
+    }
 });
 
 $app->post('/account/close', function ($request, $response, $args) {
-  if($request->getAttribute('has_errors')){
-    $errors = $request->getAttribute('errors');
-    return $response->withStatus(500)->getBody()->write($errors->toJson());
-  } else {
-    $data = $request->getParsedBody();
+  $data = $request->getParsedBody();
+  $dataValidator = v::key('accountId', v::stringType());
+  if ($dataValidator->validate($data)) {
     $accountId = $data['accountId'];
     $result = MongoHelper::getInstance()->closeAccount($accountId);
     return writeSuccess($response, array(
       'result' => $result
     ));
+  } else {
+    return writeFail($response, 400, 'Invalid input Need valid attribute *accountId*: String.');
   }
 });
 
 $app->post('/account/withdraw', function ($request, $response, $args) {
-  if($request->getAttribute('has_errors')){
-    $errors = $request->getAttribute('errors');
-    return $response->withStatus(500)->getBody()->write($errors->toJson());
-  } else {
-    $data = $request->getParsedBody();
+  $data = $request->getParsedBody();
+  $dataValidator = v::key('accountId', v::stringType())
+                  ->key('amount', v::Numeric()->positive());
+  if ($dataValidator->validate($data)) {
     $accountId = $data['accountId'];
     $amount = floatval($data['amount']);
     $result = MongoHelper::getInstance()->withdrawMoney($accountId, $amount);
@@ -73,15 +61,16 @@ $app->post('/account/withdraw', function ($request, $response, $args) {
     } else {
       return writeFail($response, 402, $result['message']);
     }
+  } else {
+    return writeFail($response, 400, 'Invalid input Need valid attributes *accountId*: String, *amount*: Positive number.');
   }
 });
 
 $app->post('/account/deposit', function ($request, $response, $args) {
-  if($request->getAttribute('has_errors')){
-    $errors = $request->getAttribute('errors');
-    return $response->withStatus(500)->getBody()->write($errors->toJson());
-  } else {
-    $data = $request->getParsedBody();
+  $data = $request->getParsedBody();
+  $dataValidator = v::key('accountId', v::stringType())
+                  ->key('amount', v::Numeric()->positive());
+  if ($dataValidator->validate($data)) {
     $accountId = $data['accountId'];
     $amount = floatval($data['amount']);
     $result = MongoHelper::getInstance()->depositMoney($accountId, $amount);
@@ -90,30 +79,19 @@ $app->post('/account/deposit', function ($request, $response, $args) {
     } else {
       return writeFail($response, 402, $result['message']);
     }
+  } else {
+    return writeFail($response, 400, 'Invalid input Need valid attributes *accountId*: String, *amount*: Positive number.');
   }
 });
 
-// $r = new HttpRequest('http://example.com/feed.rss', HttpRequest::METH_GET);
-// $r->setOptions(array('lastmodified' => filemtime('local.rss')));
-// $r->addQueryData(array('category' => 3));
-// try {
-//     $r->send();
-//     if ($r->getResponseCode() == 200) {
-//         file_put_contents('local.rss', $r->getResponseBody());
-//     }
-// } catch (HttpException $ex) {
-//     echo $ex;
-// }
-//
-
 $app->post('/account/transfer', function ($request, $response, $args) {
-  if($request->getAttribute('has_errors')){
-    $errors = $request->getAttribute('errors');
-    return $response->withStatus(500)->getBody()->write($errors->toJson());
-  } else {
-    $data = $request->getParsedBody();
-    $fromAccountId = $data['$fromAccountId'];
-    $toAccountId = $data['$toAccountId'];
+  $data = $request->getParsedBody();
+  $dataValidator = v::key('fromAccountId', v::stringType())
+                  ->key('toAccountId', v::stringType())
+                  ->key('amount', v::Numeric()->positive());
+  if ($dataValidator->validate($data)) {
+    $fromAccountId = $data['fromAccountId'];
+    $toAccountId = $data['toAccountId'];
     $amount = floatval($data['amount']);
     $result = MongoHelper::getInstance()->transfer($fromAccountId, $toAccountId, $amount);
     if ($result['status'] == 'success') {
@@ -121,5 +99,7 @@ $app->post('/account/transfer', function ($request, $response, $args) {
     } else {
       return writeFail($response, 402, $result['message']);
     }
+  } else {
+    return writeFail($response, 400, 'Invalid input Need valid attributes *fromAccountId*: String, *toAccountId*: String ,*amount*: Positive number.');
   }
 });
