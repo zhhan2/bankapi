@@ -4,7 +4,7 @@ require __DIR__ . '/../vendor/autoload.php';
 class MongoHelper {
 
 	private static $_instance; //The single instance
-  private static $bankDB; //The single instance
+  private static $bankDB;
 
   function __construct() {
     $mongoClient = new MongoDB\Client('mongodb://localhost:27017');

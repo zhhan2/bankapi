@@ -33,7 +33,8 @@ $app->post('/account/create', function ($request, $response, $args) {
         return writeFail($response, $result['code'], $result['message']);
       }
     } else {
-      return writeFail($response, 400, 'Invalid input Need valid attributes *name*: String, *id*: String.');
+      return writeFail($response, 400, 'Invalid input Need valid attributes '.
+            '*name*: String, *id*: String.');
     }
 });
 // API to close account, method POST
@@ -50,10 +51,12 @@ $app->post('/account/close', function ($request, $response, $args) {
       return writeFail($response, $result['code'], $result['message']);
     }
   } else {
-    return writeFail($response, 400, 'Invalid input Need valid attribute *accountId*: String.');
+    return writeFail($response, 400, 'Invalid input Need valid attribute '.
+          '*accountId*: String.');
   }
 });
-
+// API to withdraw money from an account, method POST
+// Required key: accountId: String, amount: Number (Positive)
 $app->post('/account/withdraw', function ($request, $response, $args) {
   $data = $request->getParsedBody();
   $dataValidator = v::key('accountId', v::stringType())
@@ -68,10 +71,12 @@ $app->post('/account/withdraw', function ($request, $response, $args) {
       return writeFail($response, $result['code'], $result['message']);
     }
   } else {
-    return writeFail($response, 400, 'Invalid input Need valid attributes *accountId*: String, *amount*: Positive number.');
+    return writeFail($response, 400, 'Invalid input Need valid attributes '.
+          '*accountId*: String, *amount*: Positive number.');
   }
 });
-
+// API to deposit money into an account, method POST
+// Required key: accountId: String, amount: Number (Positive)
 $app->post('/account/deposit', function ($request, $response, $args) {
   $data = $request->getParsedBody();
   $dataValidator = v::key('accountId', v::stringType())
@@ -86,10 +91,12 @@ $app->post('/account/deposit', function ($request, $response, $args) {
       return writeFail($response, $result['code'], $result['message']);
     }
   } else {
-    return writeFail($response, 400, 'Invalid input Need valid attributes *accountId*: String, *amount*: Positive number.');
+    return writeFail($response, 400, 'Invalid input Need valid attributes '.
+          '*accountId*: String, *amount*: Positive number.');
   }
 });
-
+// API to transfer money to another account, method POST
+// Required key: fromAccountId: String, toAccountId: String, amount: Number (Positive)
 $app->post('/account/transfer', function ($request, $response, $args) {
   $data = $request->getParsedBody();
   $dataValidator = v::key('fromAccountId', v::stringType())
@@ -107,6 +114,8 @@ $app->post('/account/transfer', function ($request, $response, $args) {
       return writeFail($response, $result['code'], $result['message']);
     }
   } else {
-    return writeFail($response, 400, 'Invalid input Need valid attributes *fromAccountId*: String, *toAccountId*: String ,*amount*: Positive number. Can not transfer to your own account');
+    return writeFail($response, 400, 'Invalid input Need valid attributes '
+          .'*fromAccountId*: String, *toAccountId*: String ,*amount*: '.
+          'Positive number. Can not transfer to your own account');
   }
 });
