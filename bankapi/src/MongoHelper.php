@@ -36,7 +36,7 @@ class MongoHelper {
       return array(
         'status' => 'fail',
         'code' => 500,
-        'content' => 'Can not insert record to DB.'
+        'message' => 'Can not insert record to DB.'
       );
     }
   }
@@ -69,8 +69,8 @@ class MongoHelper {
     } catch(\Exception $e) {
       return array(
         'status' => 'fail',
-        'code' => 500,
-        'content' => 'Can not update DB record.'
+        'code' => 400,
+        'message' => 'Can not find account.'
       );
     }
   }
@@ -111,8 +111,8 @@ class MongoHelper {
     } catch(\Exception $e) {
       return array(
         'status' => 'fail',
-        'code' => 500,
-        'content' => 'Can not update DB record.'
+        'code' => 400,
+        'message' => 'Can not find account.'
       );
     }
   }
@@ -146,8 +146,8 @@ class MongoHelper {
     } catch(\Exception $e) {
       return array(
         'status' => 'fail',
-        'code' => 500,
-        'content' => 'Can not update DB record.'
+        'code' => 400,
+        'message' => 'Can not find account.'
       );
     }
   }
@@ -250,8 +250,8 @@ class MongoHelper {
     } catch(\Exception $e) {
       return array(
         'status' => 'fail',
-        'code' => 500,
-        'message' => 'Can not update DB record.'
+        'code' => 400,
+        'message' => 'Can not find account.'
       );
     }
   }
