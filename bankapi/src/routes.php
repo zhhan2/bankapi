@@ -55,6 +55,24 @@ $app->post('/account/close', function ($request, $response, $args) {
           '*accountId*: String.');
   }
 });
+// API to get balance, method POST
+// Required key: accountId: String
+$app->post('/account/balance', function ($request, $response, $args) {
+  $data = $request->getParsedBody();
+  $dataValidator = v::key('accountId', v::stringType());
+  if ($dataValidator->validate($data)) {
+    $accountId = $data['accountId'];
+    $result = MongoHelper::getInstance()->getBalance($accountId);
+    if ($result['status'] == 'success') {
+      return writeSuccess($response, $result['content']);
+    } else {
+      return writeFail($response, $result['code'], $result['message']);
+    }
+  } else {
+    return writeFail($response, 400, 'Invalid input Need valid attribute '.
+          '*accountId*: String.');
+  }
+});
 // API to withdraw money from an account, method POST
 // Required key: accountId: String, amount: Number (Positive)
 $app->post('/account/withdraw', function ($request, $response, $args) {

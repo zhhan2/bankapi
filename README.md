@@ -14,6 +14,12 @@ POST /account/close
   accountId: String
 }`
 
+POST /account/balance
+`{
+  accountId: String
+}`
+
+
 POST /account/withdraw
 `{
   accountId: String,
